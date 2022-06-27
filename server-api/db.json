@@ -1,0 +1,42 @@
+{
+  "users": [
+    {
+      "id": "dfdfd",
+      "name": "Pankaj",
+      "email": "pankaj@gmail.com",
+      "userName": "pankaj",
+      "password": "pankaj123#",
+      "tel": "8319299466",
+      "profileImg": ""
+    },
+    {
+      "name": "Pankaj Dhurandhar",
+      "userName": "pankaj",
+      "email": "pankaj.dhurandhar@neosoftmail.com",
+      "tel": "",
+      "password": "Pankaj123$",
+      "id": "646395db-7065-4e5d-a1ee-1943dc4e8432",
+      "profileImg": ""
+    },
+   
+    {
+      "name": "Pankaj ",
+      "userName": "Rockstar",
+      "email": "pankajdhurandhar06@gmail.com",
+      "tel": "8319299466",
+      "password": "Pankaj123#",
+      "id": "9a619e64-180e-4332-813b-37fcb00b92bd",
+      "profileImg": "blob:http://localhost:3000/ddf5737d-9e5c-4963-9825-aa46e0963952"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}
