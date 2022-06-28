@@ -12,7 +12,7 @@ export const deleteApiCall = (url: string, config?: AxiosRequestConfig<any> | un
     return axios.delete(url, config);
 }
 
-export const editApiCall = (url: string, data: any, config?: AxiosRequestConfig<any> | undefined) => {
+export const updateApiCall = (url: string, data: any, config?: AxiosRequestConfig<any> | undefined) => {
     return axios.put(url, data, config);
 }
 

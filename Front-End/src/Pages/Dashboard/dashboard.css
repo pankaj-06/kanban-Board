@@ -10,7 +10,12 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    height: 10%
+    color: #FFFFFF;
+    background-color: #f06292;
+    height: 10%;
+    border: 1px solid #145EA8;
+    border-radius: 3px;
+    margin: 0 10px;
 }
 
 .dashboard-child-2 {
@@ -25,6 +30,7 @@
     border: 1px solid #bdbdbd;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 20px 25px -5px, rgba(0, 0, 0, 0.04) 0px 10px 10px -5px;
     border-radius: 6px;
+    min-height: 400px;
 }
 
 .task-container-header {
@@ -58,16 +64,11 @@
     margin-bottom: 10px;
     border: 0.5px solid #bdbdbd;
     border-radius: 3px;
+    color: #FFFFFF;
 }
 
-.task-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100px;
-    margin-left: 10px;
-    padding: 0px 10px;
-    border: 0.5px solid;
-    border-radius: 4px;
-    color: #FFFFFF;
+.task-stage-box {
+    width: 50px;
+    margin-right: 50px;
+    text-align: left;
 }

@@ -15,7 +15,7 @@ import { messagesObject } from '../../Utils/Messages';
 import ReCAPTCHA from "react-google-recaptcha";
 import { createRef, useEffect, useState } from 'react';
 import { getApiCall } from '../../Api/service';
-import { getUser } from '../../AppConfig';
+import { getUsers } from '../../AppConfig';
 import { ILoggedInUserDetails, userLoggedIn } from '../../Redux/Actions/AuthActions';
 import Loader from '../../Components/loader/loader';
 import { setTitle } from '../../Utils/Helper';
@@ -48,8 +48,8 @@ export default function Login() {
     e.preventDefault();
     isLoading(true);
     const queryString = `email=${data.email}&password=${data.password}`;
-    getApiCall(`${getUser}?${queryString}`).then((res) => {
-      if (res.statusText === "OK") {
+    getApiCall(`${getUsers}?${queryString}`).then((res) => {
+      if (res.data) {
         isLoading(false);
         const loggedInUserData = res.data[0];
         const payload: ILoggedInUserDetails = {

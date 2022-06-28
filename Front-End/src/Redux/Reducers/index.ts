@@ -1,9 +1,11 @@
 import { combineReducers } from 'redux';
 import { LOGGED_OUT_USER } from '../Actions/AuthActions';
 import { authenticationReducer } from './AuthReducer';
+import { taskReducer } from './TaskReducer';
 
 const appReducer = combineReducers({
     authenticationReducer,
+    taskReducer
 });
 
 const rootReducer = (state: any, action: any) => {

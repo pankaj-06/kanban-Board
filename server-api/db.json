@@ -18,7 +18,6 @@
       "id": "646395db-7065-4e5d-a1ee-1943dc4e8432",
       "profileImg": ""
     },
-   
     {
       "name": "Pankaj ",
       "userName": "Rockstar",
@@ -29,11 +28,20 @@
       "profileImg": "blob:http://localhost:3000/ddf5737d-9e5c-4963-9825-aa46e0963952"
     }
   ],
-  "comments": [
+  "tasks": [
     {
-      "id": 1,
-      "body": "some comment",
-      "postId": 1
+      "taskName": "Pankaj",
+      "priority": "medium",
+      "stage": 1,
+      "deadline": "06/30/2022",
+      "id": "827bfe92-36e6-44ff-9185-6e454ecd78eb"
+    },
+    {
+      "taskName": "Collect requirement-2",
+      "priority": "low",
+      "stage": 0,
+      "deadline": "07/28/2022",
+      "id": "0d610ddd-f8bf-4826-b300-ab0e68f5f74a"
     }
   ],
   "profile": {

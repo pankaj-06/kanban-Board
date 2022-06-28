@@ -1,38 +1,50 @@
 import { Box, Container, Grid, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useToasts } from "react-toast-notifications";
+import { getApiCall } from "../../Api/service";
+import { DONE, getTasks } from "../../AppConfig";
 import Loader from "../../Components/loader/loader";
-import { setTitle, statusColor } from "../../Utils/Helper";
+import { ITaskDetails } from "../../Redux/Actions/TaskActions";
+import { getStageName, setTitle, statusColor } from "../../Utils/Helper";
 import './dashboard.css';
 
-type TaksStatus = "BACKLOG" | "TODO" | "ONGOING" | "DONE"
 
 
 const Dashboard = () => {
   setTitle("Dashboard");
-  const [loading, isLoading] = useState(false);
+  const [loading, isLoading] = useState(true);
+  const { addToast } = useToasts();
+  const [tasks, setTasks] = useState<ITaskDetails[]>([]);
 
-  const numberArr: any = [
-    { status: "DONE", taskName: "123" },
-    { status: "ONGOING", taskName: "9876" },
-    { status: "BACKLOG", taskName: "4657" },
-    { status: "TODO", taskName: "4657" },
-    { status: "DONE", taskName: "123" },
-    { status: "ONGOING", taskName: "9876" },
-    { status: "BACKLOG", taskName: "4657" },
-    { status: "TODO", taskName: "4657" },
-  ];
+  useEffect(() => {
+    getApiCall(getTasks).then((res) => {
+      if (res.data) {
+        isLoading(false);
+        setTasks(res.data);
+      }
+    }).catch((err) => {
+      isLoading(false);
+      addToast(err.message, { appearance: "error" });
+    });
+  }, []);
 
 
-
-
-
-  const getTaskStatusBox = (taskDetailsArr: { status: TaksStatus, taskName: string }[], filterByStatusDone: boolean) => {
-    const filteredArr = filterByStatusDone ? taskDetailsArr.filter((val) => val.status === "DONE") : taskDetailsArr.filter((val) => val.status !== "DONE");
+  const getTaskStatusBox = (taskDetailsArr: ITaskDetails[], filterByStatusDone: boolean) => {
+    const filteredArr = filterByStatusDone ? taskDetailsArr.filter((val) => val.stage === DONE) : taskDetailsArr.filter((val) => val.stage !== DONE);
     return filteredArr.map((taskDetails, idx: number) => {
+      const styleObj = { backgroundColor: statusColor[getStageName(taskDetails.stage)], justifyContent: filterByStatusDone ? "center" : "space-between" };
       return (
-        <div key={idx} className="task-status-box">
-          {taskDetails.taskName}
-          {!filterByStatusDone && <span className="task-status" style={{ backgroundColor: statusColor[taskDetails.status] }} >{taskDetails.status}</span>}
+        <div key={idx} className="task-status-box" style={styleObj}>
+          <div style={{ marginLeft: "50px" }}>
+            {taskDetails.taskName}
+          </div>
+          {
+            !filterByStatusDone && (
+              <div className="task-stage-box" >{getStageName(taskDetails.stage)}</div>
+            )
+          }
+
         </div>
       )
     })
@@ -40,8 +52,8 @@ const Dashboard = () => {
   return (
     <Container component="div" maxWidth="lg" className="dashboard-container" >
       <div className='dashboard-child-1'>
-        <Typography component="h1" variant="h6" >
-          Total Task : {numberArr.length}
+        <Typography component="h1" variant="h6"  >
+          Total Task : {tasks.length}
         </Typography>
       </div>
       <Grid container className='dashboard-child-2'>
@@ -51,7 +63,7 @@ const Dashboard = () => {
               Completed Task's
             </div>
             <div className="task-container-body">
-              {getTaskStatusBox(numberArr, true)}
+              {getTaskStatusBox(tasks, true)}
             </div>
           </div>
         </Grid>
@@ -61,7 +73,7 @@ const Dashboard = () => {
               Pending Task's
             </div>
             <div className="task-container-body">
-              {getTaskStatusBox(numberArr, false)}
+              {getTaskStatusBox(tasks, false)}
             </div>
           </div>
         </Grid>
