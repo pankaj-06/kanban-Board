@@ -126,7 +126,7 @@ export default function Register() {
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit(submitForm)} noValidate>
                     <Grid container spacing={3}>
-                        <Grid item xs={12} md={12} sm={12}>
+                        <Grid item lg={12} md={12} sm={12}>
                             <div style={{ display: "flex", }}>
                                 <div className='prof-pic'>
                                     <div className='rel-con'>
@@ -165,7 +165,7 @@ export default function Register() {
 
                             </div>
                         </Grid>
-                        <Grid item xs={12} md={6} sm={6}>
+                        <Grid item lg={6} md={6} sm={6} xs={12}>
                             <InputField
                                 type='text'
                                 label='Username'
@@ -176,7 +176,7 @@ export default function Register() {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12} md={6} sm={6}>
+                        <Grid item lg={6} md={6} sm={6} xs={12}>
                             <InputField
                                 type='email'
                                 label='Email'
@@ -187,7 +187,7 @@ export default function Register() {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12} md={6} sm={6}>
+                        <Grid item lg={6} md={6} sm={6} xs={12}>
                             <InputField
                                 type='tel'
                                 label='Contact Number'
@@ -197,7 +197,7 @@ export default function Register() {
                                 errorMessage={errors.tel && errors.tel.message}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6} sm={6} >
+                        <Grid item lg={6} md={6} sm={6} xs={12}>
                             <InputField
                                 type='password'
                                 label='Password'
@@ -209,7 +209,7 @@ export default function Register() {
                             />
                         </Grid>
 
-                        <Grid item xs={12} md={12} sm={12}>
+                        <Grid item lg={12} md={12} sm={12} xs={12}>
                             <div style={{ display: "flex", justifyContent: "center" }}>
                                 <Button
                                     color="primary"

@@ -11,15 +11,7 @@ import { ToastProvider } from 'react-toast-notifications';
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
-root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <ToastProvider autoDismiss placement='bottom-right' autoDismissTimeout={3000}>
-        <App />
-      </ToastProvider>
-    </Provider>
-  </React.StrictMode>
-);
+root.render(<App />);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

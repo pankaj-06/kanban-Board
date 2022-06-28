@@ -44,8 +44,6 @@
 .task-container-body {
     height: 90%;
     padding: 20px 10px 10px 10px;
-    /* overflow-y: auto; */
-    /* background-color: blue; */
 }
 
 
@@ -75,12 +73,28 @@
     color: #FFFFFF;
 }
 
+.task-card-child-0 {
+    flex-basis: 10%;
+    margin: 10px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .task-card-child-1 {
     flex-basis: 80%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
+    margin-bottom: 10px;
+}
+
+.priority-and-deadline-box {
+    flex-basis: 50%;
+    display: flex;
+    align-items: center;
+    align-content: space-around;
 }
 
 .task-card-child-2 {
@@ -89,4 +103,12 @@
     align-items: center;
     justify-content: space-around;
     flex-wrap: wrap;
+}
+
+
+/* --------------------Delete Dragable Container------------------- */
+.trash-conatiner {
+    position: fixed;
+    bottom: 50px;
+    right: 20px;
 }

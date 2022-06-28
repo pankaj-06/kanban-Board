@@ -6,7 +6,8 @@ export interface ITaskDetails {
     taskName: string;
     deadline: string | null;
     priority: Priority | "";
-    stage: any
+    stage: any;
+    crtdate?: string;
 }
 
 export const TASK_CREATED = "TASK_CREATED";

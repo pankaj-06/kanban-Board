@@ -6,7 +6,9 @@ import Loader from './Components/loader/loader';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import './App.css';
 import ResponsiveAppBar from './Pages/Topbar';
-
+import { Provider } from 'react-redux';
+import { store } from './Redux/Store';
+import { ToastProvider } from 'react-toast-notifications';
 
 
 
@@ -37,4 +39,14 @@ function App() {
   );
 }
 
-export default App;
+const AppWrapper = () => {
+  return (
+    <Provider store={store}>
+      <ToastProvider autoDismiss placement='bottom-right' autoDismissTimeout={3000}>
+        <App />
+      </ToastProvider>
+    </Provider>
+  )
+}
+
+export default AppWrapper;

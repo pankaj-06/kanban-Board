@@ -34,7 +34,7 @@ export default function ResponsiveAppBar() {
     const [pages, setPage] = React.useState<IPages[]>([]);
     const userLoggedIn = localStorage.getItem("userLoggedIn");
     React.useEffect(() => {
-        if (userLoggedIn==="true") {
+        if (userLoggedIn === "true") {
             const newPageArr: IPages[] = [
                 { label: "Dashboard", path: "/dashboard" },
                 { label: "TaskManagement", path: "/task-management" },
@@ -71,6 +71,7 @@ export default function ResponsiveAppBar() {
     const handleProfileMenuOpen = (path: string) => (event: React.MouseEvent<HTMLElement>) => {
         buttonOnClickHandler(path)
         setAnchorEl(event.currentTarget);
+        handleMobileMenuClose();
     };
 
     const handleMobileMenuClose = () => {
@@ -118,7 +119,7 @@ export default function ResponsiveAppBar() {
                         component="div"
                         sx={{ display: { xs: 'none', sm: 'block' } }}
                     >
-                        Neo Kanban
+                        Kanban
                     </Typography>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>

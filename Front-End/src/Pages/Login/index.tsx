@@ -14,8 +14,8 @@ import { useToasts } from 'react-toast-notifications';
 import { messagesObject } from '../../Utils/Messages';
 import ReCAPTCHA from "react-google-recaptcha";
 import { createRef, useEffect, useState } from 'react';
-import { getApiCall } from '../../Api/service';
-import { getUsers } from '../../AppConfig';
+import { getApiCall, postApiCall } from '../../Api/service';
+import { getUsers, reCaptchaVerify, reCaptchSiteKey } from '../../AppConfig';
 import { ILoggedInUserDetails, userLoggedIn } from '../../Redux/Actions/AuthActions';
 import Loader from '../../Components/loader/loader';
 import { setTitle } from '../../Utils/Helper';
@@ -34,7 +34,7 @@ export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { addToast } = useToasts();
-  const recaptchaRef = createRef<any>();
+  const [catptchaToken, setCaptchaToken] = useState<string | null>("");
 
 
   useEffect(() => {
@@ -46,39 +46,46 @@ export default function Login() {
 
   const submit = (data: any, e: any) => {
     e.preventDefault();
-    isLoading(true);
-    const queryString = `email=${data.email}&password=${data.password}`;
-    getApiCall(`${getUsers}?${queryString}`).then((res) => {
-      if (res.data) {
-        isLoading(false);
-        const loggedInUserData = res.data[0];
-        const payload: ILoggedInUserDetails = {
-          name: loggedInUserData.name,
-          email: loggedInUserData.email,
-          profileImg: loggedInUserData.profileImg,
-          tel: loggedInUserData.tel,
-          userName: loggedInUserData.userName
+    if (catptchaToken) {
+      isLoading(true);
+      const queryString = `email=${data.email}&password=${data.password}`;
+      getApiCall(`${getUsers}?${queryString}`).then((res) => {
+        if (res.data) {
+          isLoading(false);
+          const loggedInUserData = res.data[0];
+          const payload: ILoggedInUserDetails = {
+            name: loggedInUserData.name,
+            email: loggedInUserData.email,
+            profileImg: loggedInUserData.profileImg,
+            tel: loggedInUserData.tel,
+            userName: loggedInUserData.userName
+          }
+          localStorage.setItem("userLoggedIn", "true");
+          dispatch(userLoggedIn(payload));
+          navigate('/dashboard');
+          addToast(messagesObject.loginSuccess, {
+            appearance: "success"
+          });
         }
-        localStorage.setItem("userLoggedIn", "true");
-        dispatch(userLoggedIn(payload));
-        navigate('/dashboard');
-        addToast(messagesObject.loginSuccess, {
-          appearance: "success"
+      }).catch(() => {
+        isLoading(false);
+        addToast(messagesObject.emailOrPwdIncorrect, {
+          appearance: "error"
         });
-      }
-    }).catch(() => {
-      isLoading(false);
-      addToast(messagesObject.emailOrPwdIncorrect, {
+      })
+    } else {
+      addToast(messagesObject.captchaRequired, {
         appearance: "error"
-      });
-    })
+      })
+    }
+
   };
 
   return (
     <Container component="main" maxWidth="xs" className='login-container'>
       <Box
         sx={{
-          marginTop: 4,
+          marginTop: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -92,7 +99,7 @@ export default function Login() {
         </Typography>
         <Box component="form" onSubmit={handleSubmit(submit)} noValidate sx={{ mt: 1 }}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={12} sm={12}>
+            <Grid item lg={12} md={12} sm={12} xs={12}>
               <InputField
                 type='email'
                 label='Email'
@@ -103,7 +110,7 @@ export default function Login() {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={12} sm={12}>
+            <Grid item lg={12} md={12} sm={12} xs={12}>
               <InputField
                 type='password'
                 label='Password'
@@ -114,12 +121,23 @@ export default function Login() {
                 required
               />
             </Grid>
-            <Grid item xs={12} md={12} sm={12}>
+            <Grid item lg={12} md={12} sm={12} xs={12}>
+              <div className='captcha-container'>
+                <ReCAPTCHA
+                  sitekey={reCaptchSiteKey}
+                  onChange={setCaptchaToken}
+                  onExpired={() => {
+                    setCaptchaToken(null);
+                  }}
+                />
+              </div>
+            </Grid>
+            <Grid item lg={12} md={12} sm={12} xs={12}>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 1, mb: 1 }}
               >
                 Sign In
               </Button>

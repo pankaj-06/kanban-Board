@@ -17,6 +17,7 @@ import { useToasts } from "react-toast-notifications";
 import { useDispatch, useSelector } from "react-redux";
 import { createTaskAction, deleteTaskAction, ITaskDetails, setTasksAction, Stage, updateTaskAction } from "../../Redux/Actions/TaskActions";
 import { RootState } from "../../Redux/Store";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
     Button,
     Container,
@@ -78,23 +79,24 @@ const TaskManagement = () => {
     const [invalidDate, setInvalidDate] = useState('');
     const [selectedTaskId, setSelectedId] = useState("");
     const [popUpType, setPopupType] = useState<"CREATE" | "UPDATE">();
+    const [trashDisplay, setTrashDisplay] = useState(false);
     //Redux Hooks
     const dispatch = useDispatch();
-    const tasks: ITaskDetails[] = useSelector((state: RootState) => state.taskReducer.tasks);
+    const tasks: ITaskDetails[] | undefined = useSelector((state: RootState) => state.taskReducer.tasks);
 
     useEffect(() => {
-        getApiCall(getTasks).then((res) => {
-            if (res.data) {
+        if (!tasks) {
+            getApiCall(getTasks).then((res) => {
+                if (res.data) {
+                    isLoading(false);
+                    dispatch(setTasksAction(res.data));
+                }
+            }).catch((err) => {
                 isLoading(false);
-                const tasksArray: any = [...tasks, res.data];
-                const finaleTaskArr: ITaskDetails[] = Array.from(new Set(tasksArray))[0] as ITaskDetails[];
-                dispatch(setTasksAction(finaleTaskArr));
-            }
-        }).catch((err) => {
-            isLoading(false);
-            addToast(err.message, { appearance: "error" });
-        });
-    }, []);
+                addToast(err.message, { appearance: "error" });
+            });
+        }
+    }, [tasks]);
 
     const onChangeHandler = (e: any) => {
         const newStateObj: any = { ...state, [e.target.name]: e.target.value };
@@ -139,7 +141,8 @@ const TaskManagement = () => {
                 taskName: state.taskName,
                 priority: state.priority,
                 stage: +state.stage,
-                deadline: moment(state.deadline).format("MM/DD/yyyy")
+                deadline: moment(state.deadline).format("MM/DD/yyyy"),
+                crtdate: moment().format("MM/DD/yyyy")
             }
 
             if (popUpType === "CREATE") {
@@ -172,7 +175,6 @@ const TaskManagement = () => {
             setErrorState({ ...errorState, ...newErrorObj });
         }
     }
-
 
     //This function is used for update api call for update task in DB.
     const updateTask = (payload: ITaskDetails) => {
@@ -265,62 +267,97 @@ const TaskManagement = () => {
 
     const taskCard = (tasksArray: ITaskDetails[] = [], stage: Stage) => {
         const filteredArr = tasksArray.filter((taskObj) => taskObj.stage === stage);
-        return filteredArr.map((taskObj: ITaskDetails) => (
-            <div key={taskObj.id}
-                className="task-card"
-                style={{ backgroundColor: statusColor[getStageName(taskObj.stage)] }}
+        return filteredArr.map((taskObj: ITaskDetails, idx: number) => (
+            <Draggable
+                key={taskObj.id!}
+                draggableId={taskObj.id!}
+                index={idx}
             >
-                <div className="task-card-child-1">
-                    <div>
-                        {taskObj.taskName}
-                    </div>
-                    <div>
-                        {taskObj.deadline}
-                    </div>
-                </div>
-                <div className="task-card-child-2">
-                    <Tooltip title="Back">
-                        <IconButton
-                            disabled={taskObj.stage === BACKLOG ? true : false}
-                            aria-label="back"
-                            color="inherit"
-                            size="small"
-                            onClick={() => backForwardHandler(taskObj, "PREVIOUS")}>
-                            <ArrowBackIosIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Edit">
-                        <IconButton
-                            aria-label="edit"
-                            color="inherit"
-                            size="small"
-                            onClick={() => onEditTaskHandler(taskObj)}>
-                            <BorderColorIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                        <IconButton
-                            aria-label="delete"
-                            color="inherit"
-                            size="small"
-                            onClick={() => handleClickOpenConfirmationPopup(taskObj.id!)}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Forward">
-                        <IconButton
-                            disabled={taskObj.stage === DONE ? true : false}
-                            aria-label="forward"
-                            color="inherit"
-                            size="small"
-                            onClick={() => backForwardHandler(taskObj, "NEXT")}>
-                            <ArrowForwardIosIcon />
-                        </IconButton>
-                    </Tooltip>
-                </div>
-            </div>
+                {(provided, snapshot) => (
+                    <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                    >
+                        <div key={taskObj.id}
+                            className="task-card"
+                            style={{ backgroundColor: statusColor[getStageName(taskObj.stage)] }}
+                        >
+                            <div className="task-card-child-1">
+                                <div>{taskObj.taskName}</div>
+                                <div>Priority : {taskObj.priority.toUpperCase()}</div>
+                                <div>Deadline : {taskObj.deadline}</div>
+                            </div>
+                            <div className="task-card-child-2">
+                                <Tooltip title="Back">
+                                    <IconButton
+                                        disabled={taskObj.stage === BACKLOG ? true : false}
+                                        aria-label="back"
+                                        color="inherit"
+                                        size="small"
+                                        onClick={() => backForwardHandler(taskObj, "PREVIOUS")}>
+                                        <ArrowBackIosIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Edit">
+                                    <IconButton
+                                        aria-label="edit"
+                                        color="inherit"
+                                        size="small"
+                                        onClick={() => onEditTaskHandler(taskObj)}>
+                                        <BorderColorIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Delete">
+                                    <IconButton
+                                        aria-label="delete"
+                                        color="inherit"
+                                        size="small"
+                                        onClick={() => handleClickOpenConfirmationPopup(taskObj.id!)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Forward">
+                                    <IconButton
+                                        disabled={taskObj.stage === DONE ? true : false}
+                                        aria-label="forward"
+                                        color="inherit"
+                                        size="small"
+                                        onClick={() => backForwardHandler(taskObj, "NEXT")}>
+                                        <ArrowForwardIosIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </div>
+                        </div>
+                    </div >
+                )}
+            </Draggable >
         ))
     }
+
+    const onDragEnd = (result: any) => {
+        const { draggableId, destination, } = result;
+        if (destination && +destination.droppableId === -1) {
+            handleClickOpenConfirmationPopup(draggableId);
+        } else {
+            const matchedObj = tasks && tasks.find((val) => val.id === draggableId);;
+            if (matchedObj && +destination.droppableId !== matchedObj.stage) {
+                const payload: ITaskDetails = {
+                    ...matchedObj,
+                    stage: +destination.droppableId
+                };
+                updateTask(payload);
+            }
+        }
+
+        setTrashDisplay(false);
+    }
+
+    const onDragStart = () => {
+        setTrashDisplay(true);
+    }
+
+
 
     return (
         <Container component="div" maxWidth="lg" className="task-management-container" >
@@ -338,48 +375,98 @@ const TaskManagement = () => {
                     Add Task
                 </Button>
             </div>
-            <Grid container className='task-management-child-2'>
-                <Grid item lg={3} md={6} sm={12}>
-                    <div className="task-conatiner">
-                        <div className="task-container-header" style={{ backgroundColor: statusColor.Backlog }}>
-                            Backlog Task's
+            <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
+                <Grid container className='task-management-child-2'>
+                    <Grid item lg={3} md={6} xs={12}>
+                        <div className="task-conatiner">
+                            <div className="task-container-header" style={{ backgroundColor: statusColor.Backlog }}>
+                                Backlog Task's
+                            </div>
+                            <Droppable key={BACKLOG} droppableId={`${BACKLOG}`}>
+                                {(provided, snapshot) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                    >
+                                        <div className="task-container-body">
+                                            {taskCard(tasks, BACKLOG)}
+                                        </div>
+                                    </div>
+                                )}
+                            </Droppable>
                         </div>
-                        <div className="task-container-body">
-                            {taskCard(tasks, BACKLOG)}
+                    </Grid>
+                    <Grid item lg={3} md={6} xs={12}>
+                        <div className="task-conatiner">
+                            <div className="task-container-header" style={{ backgroundColor: statusColor.Todo }}>
+                                Todo Task's
+                            </div>
+                            <Droppable key={TODO} droppableId={`${TODO}`}>
+                                {(provided, snapshot) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                    >
+                                        <div className="task-container-body">
+                                            {taskCard(tasks, TODO)}
+                                        </div>
+                                    </div>
+                                )}
+                            </Droppable>
                         </div>
-                    </div>
+                    </Grid>
+                    <Grid item lg={3} md={6} xs={12}>
+                        <div className="task-conatiner">
+                            <div className="task-container-header" style={{ backgroundColor: statusColor.Ongoing }}>
+                                Ongoing Task's
+                            </div>
+                            <Droppable key={ONGOING} droppableId={`${ONGOING}`}>
+                                {(provided, snapshot) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                    >
+                                        <div className="task-container-body">
+                                            {taskCard(tasks, ONGOING)}
+                                        </div>
+                                    </div>
+                                )}
+                            </Droppable>
+                        </div>
+                    </Grid>
+                    <Grid item lg={3} md={6} xs={12}>
+                        <div className="task-conatiner">
+                            <div className="task-container-header" style={{ backgroundColor: statusColor.Done }}>
+                                Completed Task's
+                            </div>
+                            <Droppable key={DONE} droppableId={`${DONE}`}>
+                                {(provided, snapshot) => (
+                                    <div
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                    >
+                                        <div className="task-container-body">
+                                            {taskCard(tasks, DONE)}
+                                        </div>
+                                    </div>
+                                )}
+                            </Droppable>
+                        </div>
+                    </Grid>
                 </Grid>
-                <Grid item lg={3} md={6} sm={12}>
-                    <div className="task-conatiner">
-                        <div className="task-container-header" style={{ backgroundColor: statusColor.Todo }}>
-                            Todo Task's
-                        </div>
-                        <div className="task-container-body">
-                            {taskCard(tasks, TODO)}
-                        </div>
-                    </div>
-                </Grid>
-                <Grid item lg={3} md={6} sm={12}>
-                    <div className="task-conatiner">
-                        <div className="task-container-header" style={{ backgroundColor: statusColor.Ongoing }}>
-                            Ongoing Task's
-                        </div>
-                        <div className="task-container-body">
-                            {taskCard(tasks, ONGOING)}
-                        </div>
-                    </div>
-                </Grid>
-                <Grid item lg={3} md={6} sm={12}>
-                    <div className="task-conatiner">
-                        <div className="task-container-header" style={{ backgroundColor: statusColor.Done }}>
-                            Completed Task's
-                        </div>
-                        <div className="task-container-body">
-                            {taskCard(tasks, DONE)}
-                        </div>
-                    </div>
-                </Grid>
-            </Grid>
+                <div className="trash-conatiner">
+                    <Droppable key={-1} droppableId={`${-1}`}>
+                        {(provided, snapshot) => (
+                            <div
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                            >
+                                {trashDisplay && <DeleteIcon style={{ fontSize: "50px", color: "#d50000" }} />}
+                            </div>
+                        )}
+                    </Droppable>
+                </div>
+            </DragDropContext>
 
 
             {/* Create Task Popup */}
