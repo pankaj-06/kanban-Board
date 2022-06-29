@@ -1,4 +1,4 @@
-import { ILoggedInUserDetails, LOGGED_IN_USER, LOGGED_OUT_USER } from "../../Actions/AuthActions";
+import { ILoggedInUserDetails, LOGGED_IN_USER } from "../../Actions/AuthActions";
 
 
 export const initialAuthState: ILoggedInUserDetails = {

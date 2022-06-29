@@ -5,7 +5,7 @@ export const setTitle = (title: string) => {
 }
 
 
-export const statusColor: any = {
+export const stageColor: any = {
     Backlog: "#b39ddb",
     Todo: "#ff9800",
     Ongoing: "#ffcc80",

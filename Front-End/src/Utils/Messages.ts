@@ -16,5 +16,6 @@ export const messagesObject = {
     taskUpdated: "Task updated successfully.",
     deletedTask: "Task deleted successfully.",
     contactAdmin: "Please contact your administrator.",
-    captchaRequired: 'Please confirm you are not a robot.'
+    captchaRequired: 'Please confirm you are not a robot.',
+    taskExist: "Task name already exist.",
 }

@@ -13,12 +13,13 @@ import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
 import { messagesObject } from '../../Utils/Messages';
 import ReCAPTCHA from "react-google-recaptcha";
-import { createRef, useEffect, useState } from 'react';
-import { getApiCall, postApiCall } from '../../Api/service';
-import { getUsers, reCaptchaVerify, reCaptchSiteKey } from '../../AppConfig';
+import { useEffect, useState } from 'react';
+import { getApiCall } from '../../Api/service';
+import { getUsers, reCaptchSiteKey } from '../../AppConfig';
 import { ILoggedInUserDetails, userLoggedIn } from '../../Redux/Actions/AuthActions';
 import Loader from '../../Components/loader/loader';
 import { setTitle } from '../../Utils/Helper';
+import { AxiosError } from 'axios';
 
 
 interface ILoginData {
@@ -44,7 +45,7 @@ export default function Login() {
     isLoading(false);
   }, [])
 
-  const submit = (data: any, e: any) => {
+  const submitLoginFormHandler = (data: any, e: any) => {
     e.preventDefault();
     if (catptchaToken) {
       isLoading(true);
@@ -67,11 +68,17 @@ export default function Login() {
             appearance: "success"
           });
         }
-      }).catch(() => {
+      }).catch((err: AxiosError) => {
         isLoading(false);
-        addToast(messagesObject.emailOrPwdIncorrect, {
-          appearance: "error"
-        });
+        if (err.code === "ERR_NETWORK") {
+          addToast(`${err.message}. ${messagesObject.contactAdmin}`, {
+            appearance: "error"
+          });
+        } else {
+          addToast(messagesObject.emailOrPwdIncorrect, {
+            appearance: "error"
+          });
+        }
       })
     } else {
       addToast(messagesObject.captchaRequired, {
@@ -97,7 +104,7 @@ export default function Login() {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <Box component="form" onSubmit={handleSubmit(submit)} noValidate sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={handleSubmit(submitLoginFormHandler)} noValidate sx={{ mt: 1 }}>
           <Grid container spacing={3}>
             <Grid item lg={12} md={12} sm={12} xs={12}>
               <InputField

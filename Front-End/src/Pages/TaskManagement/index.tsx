@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Loader from "../../Components/loader/loader";
-import { getStageName, prioritiesArr, setTitle, stagesArray, statusColor } from "../../Utils/Helper";
+import { getStageName, prioritiesArr, setTitle, stagesArray, stageColor } from "../../Utils/Helper";
 import CloseIcon from '@mui/icons-material/Close';
 import './task-management.css';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -38,6 +38,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import BorderColorIcon from '@mui/icons-material/BorderColor';
+import { AxiosError } from "axios";
 
 
 
@@ -98,24 +99,36 @@ const TaskManagement = () => {
         }
     }, [tasks]);
 
-    const onChangeHandler = (e: any) => {
-        const newStateObj: any = { ...state, [e.target.name]: e.target.value };
-        const newErrorStateObj: any = { ...errorState, [e.target.name]: "" };
-        setState(newStateObj);
-        setErrorState(newErrorStateObj);
-    }
+    useEffect(() => {
+        validateDatePicker()
+    }, [state.deadline]);
+
+    const handleOpenTaskPopup = () => {
+        setOpen(true);
+    };
+    const handleCloseTaskPopup = () => {
+        setOpen(false);
+    };
+
+    const handleClickOpenConfirmationPopup = (id: string) => {
+        setConfirmationDialog(true);
+        setSelectedId(id);
+    };
+    const handleCloseConfirmationPopup = () => {
+        setConfirmationDialog(false);
+    };
 
     const onDateSelect = (date: any) => {
         setState({ ...state, deadline: date });
         setErrorState({ ...errorState, deadline: "" });
     }
 
-
-    useEffect(() => {
-        validateDatePicker()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.deadline]);
-
+    const onChangeHandler = (e: any) => {
+        const newStateObj: any = { ...state, [e.target.name]: e.target.value };
+        const newErrorStateObj: any = { ...errorState, [e.target.name]: "" };
+        setState(newStateObj);
+        setErrorState(newErrorStateObj);
+    }
 
     const validateDatePicker = () => {
         const date = state.deadline;
@@ -133,37 +146,40 @@ const TaskManagement = () => {
         }
     }
 
-    const onSubmitCreateTask = (e: any) => {
+    const onSubmitTaskForm = (e: any) => {
         e.preventDefault();
         isLoading(true);
         if (state.taskName && state.priority && state.deadline && !invalidDate) {
             const payload: ITaskDetails = {
-                taskName: state.taskName,
+                taskName: state.taskName.trim(),
                 priority: state.priority,
                 stage: +state.stage,
                 deadline: moment(state.deadline).format("MM/DD/yyyy"),
                 crtdate: moment().format("MM/DD/yyyy")
             }
-
             if (popUpType === "CREATE") {
                 payload.id = uuidv4();
-                postApiCall(taskApi, payload).then((res) => {
-                    if (res.statusText === "Created") {
-                        isLoading(false);
-                        dispatch(createTaskAction(payload));
-                        setState({ ...taskInitState });
-                        handleCloseTaskPopup();
-                        addToast(messagesObject.taskCreated, { appearance: "success" });
-                    }
-                }).catch((err) => {
+                const existTask = tasks?.find((val) => val.taskName === state.taskName);
+                if (!existTask) {
+                    postApiCall(taskApi, payload).then((res) => {
+                        if (res.statusText === "Created") {
+                            isLoading(false);
+                            dispatch(createTaskAction(payload));
+                            setState({ ...taskInitState });
+                            handleCloseTaskPopup();
+                            addToast(messagesObject.taskCreated, { appearance: "success" });
+                        }
+                    }).catch((err) => {
+                        showErrorTosat(err);
+                    })
+                } else {
                     isLoading(false);
-                    addToast(messagesObject.contactAdmin, { appearance: "error" });
-                })
+                    addToast(messagesObject.taskExist, { appearance: "info" });
+                }
             } else {
                 payload.id = selectedTaskId;
                 updateTask(payload);
             }
-
         } else {
             isLoading(false);
             const newErrorObj: any = {};
@@ -185,27 +201,19 @@ const TaskManagement = () => {
             setState({ ...taskInitState });
             handleCloseTaskPopup();
             addToast(messagesObject.taskUpdated, { appearance: "success" });
-        }).catch((err) => {
-            isLoading(false);
-            addToast(messagesObject.contactAdmin, { appearance: "error" });
+        }).catch((err: AxiosError) => {
+            showErrorTosat(err);
         })
     }
 
-    const handleOpenTaskPopup = () => {
-        setOpen(true);
-    };
-    const handleCloseTaskPopup = () => {
-        setOpen(false);
-    };
-
-    const handleClickOpenConfirmationPopup = (id: string) => {
-        setConfirmationDialog(true);
-        setSelectedId(id);
-    };
-    const handleCloseConfirmationPopup = () => {
-        setConfirmationDialog(false);
-    };
-
+    const showErrorTosat = (err: AxiosError) => {
+        isLoading(false);
+        if (err.code === "ERR_NETWORK") {
+            addToast(`${err.message}. ${messagesObject.contactAdmin}`, { appearance: "error" });
+        } else {
+            addToast(err.message, { appearance: "error" });
+        }
+    }
 
     const BootstrapDialogTitle = (props: DialogTitleProps) => {
         const { children, onClose, ...other } = props;
@@ -230,7 +238,6 @@ const TaskManagement = () => {
         );
     };
 
-
     const onDeleteTaskHandler = () => {
         isLoading(true);
         handleCloseConfirmationPopup();
@@ -240,8 +247,7 @@ const TaskManagement = () => {
             dispatch(deleteTaskAction(selectedTaskId));
             addToast(messagesObject.deletedTask, { appearance: "success" });
         }).catch((err) => {
-            isLoading(false);
-            addToast(err.message, { appearance: "error" });
+            showErrorTosat(err);
         })
     }
 
@@ -281,7 +287,7 @@ const TaskManagement = () => {
                     >
                         <div key={taskObj.id}
                             className="task-card"
-                            style={{ backgroundColor: statusColor[getStageName(taskObj.stage)] }}
+                            style={{ backgroundColor: stageColor[getStageName(taskObj.stage)] }}
                         >
                             <div className="task-card-child-1">
                                 <div>{taskObj.taskName}</div>
@@ -357,8 +363,6 @@ const TaskManagement = () => {
         setTrashDisplay(true);
     }
 
-
-
     return (
         <Container component="div" maxWidth="lg" className="task-management-container" >
             <div className='task-management-child-1'>
@@ -379,7 +383,7 @@ const TaskManagement = () => {
                 <Grid container className='task-management-child-2'>
                     <Grid item lg={3} md={6} xs={12}>
                         <div className="task-conatiner">
-                            <div className="task-container-header" style={{ backgroundColor: statusColor.Backlog }}>
+                            <div className="task-container-header" style={{ backgroundColor: stageColor.Backlog }}>
                                 Backlog Task's
                             </div>
                             <Droppable key={BACKLOG} droppableId={`${BACKLOG}`}>
@@ -398,7 +402,7 @@ const TaskManagement = () => {
                     </Grid>
                     <Grid item lg={3} md={6} xs={12}>
                         <div className="task-conatiner">
-                            <div className="task-container-header" style={{ backgroundColor: statusColor.Todo }}>
+                            <div className="task-container-header" style={{ backgroundColor: stageColor.Todo }}>
                                 Todo Task's
                             </div>
                             <Droppable key={TODO} droppableId={`${TODO}`}>
@@ -417,7 +421,7 @@ const TaskManagement = () => {
                     </Grid>
                     <Grid item lg={3} md={6} xs={12}>
                         <div className="task-conatiner">
-                            <div className="task-container-header" style={{ backgroundColor: statusColor.Ongoing }}>
+                            <div className="task-container-header" style={{ backgroundColor: stageColor.Ongoing }}>
                                 Ongoing Task's
                             </div>
                             <Droppable key={ONGOING} droppableId={`${ONGOING}`}>
@@ -436,7 +440,7 @@ const TaskManagement = () => {
                     </Grid>
                     <Grid item lg={3} md={6} xs={12}>
                         <div className="task-conatiner">
-                            <div className="task-container-header" style={{ backgroundColor: statusColor.Done }}>
+                            <div className="task-container-header" style={{ backgroundColor: stageColor.Done }}>
                                 Completed Task's
                             </div>
                             <Droppable key={DONE} droppableId={`${DONE}`}>
@@ -550,7 +554,7 @@ const TaskManagement = () => {
                         autoFocus
                         variant="contained"
                         style={{ width: "150px" }}
-                        onClick={onSubmitCreateTask}
+                        onClick={onSubmitTaskForm}
                     >
                         {popUpType === "CREATE" ? "Create Task" : "Update Task"}
                     </Button>

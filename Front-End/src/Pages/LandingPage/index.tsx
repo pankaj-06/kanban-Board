@@ -1,7 +1,6 @@
 import { Grid } from "@mui/material";
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom";
-import { userLoggedOut } from "../../Redux/Actions/AuthActions";
 import { setTitle } from "../../Utils/Helper";
 
 const LandingPage = () => {

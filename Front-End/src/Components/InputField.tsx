@@ -1,6 +1,4 @@
-import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { IconButton, InputAdornment, TextField } from '@mui/material';
-import { useState } from 'react';
+import { TextField } from '@mui/material';
 import { messagesObject } from '../Utils/Messages';
 import { RegularExpressions } from '../Utils/Regex';
 import SetRequiredLable from './SetRequiredLable';

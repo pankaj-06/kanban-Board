@@ -5,8 +5,9 @@ import { useToasts } from "react-toast-notifications";
 import { getApiCall } from "../../Api/service";
 import { DONE, getTasks } from "../../AppConfig";
 import Loader from "../../Components/loader/loader";
-import { ITaskDetails } from "../../Redux/Actions/TaskActions";
-import { getStageName, setTitle, statusColor } from "../../Utils/Helper";
+import { ITaskDetails, setTasksAction } from "../../Redux/Actions/TaskActions";
+import { RootState } from "../../Redux/Store";
+import { getStageName, setTitle, stageColor } from "../../Utils/Helper";
 import './dashboard.css';
 
 
@@ -15,25 +16,30 @@ const Dashboard = () => {
   setTitle("Dashboard");
   const [loading, isLoading] = useState(true);
   const { addToast } = useToasts();
-  const [tasks, setTasks] = useState<ITaskDetails[]>([]);
+  //Redux Hooks
+  const dispatch = useDispatch();
+  const tasksData: ITaskDetails[] | undefined = useSelector((state: RootState) => state.taskReducer.tasks);
 
   useEffect(() => {
-    getApiCall(getTasks).then((res) => {
-      if (res.data) {
+    if (!tasksData) {
+      getApiCall(getTasks).then((res) => {
+        if (res.data) {
+          isLoading(false);
+          dispatch(setTasksAction(res.data));
+        }
+      }).catch((err) => {
         isLoading(false);
-        setTasks(res.data);
-      }
-    }).catch((err) => {
-      isLoading(false);
-      addToast(err.message, { appearance: "error" });
-    });
-  }, []);
+        addToast(err.message, { appearance: "error" });
+      });
+    }
+    isLoading(false);
+  }, [tasksData]);
 
 
-  const getTaskStatusBox = (taskDetailsArr: ITaskDetails[], filterByStatusDone: boolean) => {
+  const getTaskStatusBox = (taskDetailsArr: ITaskDetails[] = [], filterByStatusDone: boolean) => {
     const filteredArr = filterByStatusDone ? taskDetailsArr.filter((val) => val.stage === DONE) : taskDetailsArr.filter((val) => val.stage !== DONE);
     return filteredArr.map((taskDetails, idx: number) => {
-      const styleObj = { backgroundColor: statusColor[getStageName(taskDetails.stage)], justifyContent: filterByStatusDone ? "center" : "space-between" };
+      const styleObj = { backgroundColor: stageColor[getStageName(taskDetails.stage)], justifyContent: filterByStatusDone ? "center" : "space-between" };
       return (
         <div key={idx} className="task-status-box" style={styleObj}>
           <div style={{ marginLeft: "50px" }}>
@@ -44,7 +50,6 @@ const Dashboard = () => {
               <div className="task-stage-box" >{getStageName(taskDetails.stage)}</div>
             )
           }
-
         </div>
       )
     })
@@ -53,7 +58,7 @@ const Dashboard = () => {
     <Container component="div" maxWidth="lg" className="dashboard-container" >
       <div className='dashboard-child-1'>
         <Typography component="h1" variant="h6"  >
-          Total Task : {tasks.length}
+          {tasksData ? `Total Task : ${tasksData.length}` : null}
         </Typography>
       </div>
       <Grid container className='dashboard-child-2'>
@@ -63,7 +68,7 @@ const Dashboard = () => {
               Completed Task's
             </div>
             <div className="task-container-body">
-              {getTaskStatusBox(tasks, true)}
+              {getTaskStatusBox(tasksData, true)}
             </div>
           </div>
         </Grid>
@@ -73,7 +78,7 @@ const Dashboard = () => {
               Pending Task's
             </div>
             <div className="task-container-body">
-              {getTaskStatusBox(tasks, false)}
+              {getTaskStatusBox(tasksData, false)}
             </div>
           </div>
         </Grid>

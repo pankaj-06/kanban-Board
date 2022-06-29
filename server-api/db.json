@@ -12,28 +12,20 @@
   ],
   "tasks": [
     {
-      "taskName": "Hourly Rounding",
-      "priority": "medium",
-      "stage": 1,
-      "deadline": "06/30/2022",
-      "crtdate": "06/29/2022",
-      "id": "bd3cad5c-56cb-4a5b-892a-2720b4384497"
-    },
-    {
-      "taskName": "Safety Areas",
-      "priority": "high",
-      "stage": 1,
-      "deadline": "07/05/2022",
-      "crtdate": "06/29/2022",
-      "id": "d134afc1-d9b2-4d62-9c64-203e72bbec89"
-    },
-    {
       "taskName": "Chart improvement",
       "priority": "low",
-      "stage": 0,
-      "deadline": "07/20/2022",
+      "stage": 2,
+      "deadline": "06/30/2022",
       "crtdate": "06/29/2022",
-      "id": "b8b9ecd4-db06-4575-98ce-81b44177fe85"
+      "id": "5d768bed-1ee2-4200-a4c4-aa423311cea5"
+    },
+    {
+      "taskName": "Collect requirement",
+      "priority": "high",
+      "stage": 0,
+      "deadline": "06/30/2022",
+      "crtdate": "06/29/2022",
+      "id": "3c717802-7ab1-4a7e-b835-c8d061682404"
     }
   ]
 }

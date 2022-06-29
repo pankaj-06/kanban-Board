@@ -20,6 +20,7 @@ import { getApiCall, postApiCall } from '../../Api/service';
 import { createUser, findUser } from '../../AppConfig';
 import Loader from '../../Components/loader/loader';
 import { setTitle } from '../../Utils/Helper';
+import { AxiosError } from 'axios';
 
 export type fileAcceptType = "image/*" | ".png" | ".jpeg" | ".jpg";
 export interface IUserDetails {
@@ -50,7 +51,7 @@ export default function Register() {
     }, []);
 
 
-    const submitForm = (data: any, e: any) => {
+    const submitFormHandler = (data: any, e: any) => {
         e.preventDefault();
         isLoading(true);
         getApiCall(`${findUser}${data.email}`).then((res) => {
@@ -69,9 +70,13 @@ export default function Register() {
                         });
                         isLoading(false);
                     }
-                }).catch(() => {
-                    addToast(messagesObject.contactAdmin, { appearance: "error" });
-                    isLoading(true);
+                }).catch((err: AxiosError) => {
+                    isLoading(false);
+                    if (err.code === "ERR_NETWORK") {
+                        addToast(`${err.message}. ${messagesObject.contactAdmin}`, {
+                            appearance: "error"
+                        });
+                    }
                 })
             }
         }).catch(() => {
@@ -124,7 +129,7 @@ export default function Register() {
                 <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
                     Sign up
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit(submitForm)} noValidate>
+                <Box component="form" onSubmit={handleSubmit(submitFormHandler)} noValidate>
                     <Grid container spacing={3}>
                         <Grid item lg={12} md={12} sm={12}>
                             <div style={{ display: "flex", }}>
