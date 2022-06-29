@@ -19,8 +19,7 @@ interface IPages {
 }
 
 
-export default function ResponsiveAppBar() {
-    const { email } = useSelector((state: RootState) => state.authenticationReducer);
+export default function TopBar() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [pages, setPage] = React.useState<IPages[]>([]);
@@ -106,14 +105,6 @@ export default function ResponsiveAppBar() {
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static">
                 <Toolbar>
-                    <Typography
-                        variant="h6"
-                        noWrap
-                        component="div"
-                        sx={{ display: { xs: 'none', sm: 'block' } }}
-                    >
-                        Kanban
-                    </Typography>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
                         {pages.map((page: IPages, idx: number) => (

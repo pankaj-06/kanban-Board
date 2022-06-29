@@ -50,24 +50,33 @@ export default function Register() {
         isLoading(false);
     }, []);
 
+    //this useeffect used for validate file.
+    useEffect(() => {
+        if (fileObj) {
+            if (fileObj.type.split('/')[0] !== getFileType("image/*")) {
+                addToast(messagesObject.validFile, { appearance: "warning" });
+                setFileObj(undefined);
+                setProfileUrl("");
+            }
+        }
+    }, [fileObj]);
 
+    /**
+   * This function is used for submit register form data and calling register api.
+   */
     const submitFormHandler = (data: any, e: any) => {
         e.preventDefault();
         isLoading(true);
         getApiCall(`${findUser}${data.email}`).then((res) => {
             if (res.data.length > 0) {
-                addToast(messagesObject.userExist, {
-                    appearance: "error"
-                });
+                addToast(messagesObject.userExist, { appearance: "error" });
                 isLoading(false);
             } else {
                 const payload = { ...data, id: uuidv4(), profileImg: profileUrl || "" }
                 postApiCall(createUser, payload).then((res) => {
                     if (res.statusText === 'Created') {
                         navigate('/signIn');
-                        addToast(messagesObject.registrationSuccess, {
-                            appearance: "success"
-                        });
+                        addToast(messagesObject.registrationSuccess, { appearance: "success" });
                         isLoading(false);
                     }
                 }).catch((err: AxiosError) => {
@@ -101,18 +110,6 @@ export default function Register() {
             return 'image';
         }
     };
-
-    //this useeffect used for validate file.
-    useEffect(() => {
-        if (fileObj) {
-            if (fileObj.type.split('/')[0] !== getFileType("image/*")) {
-                addToast(messagesObject.validFile, { appearance: "warning" });
-                setFileObj(undefined);
-                setProfileUrl("");
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fileObj]);
 
     return (
         <Container component="main" maxWidth="md" className='registration-form-conatiner'>

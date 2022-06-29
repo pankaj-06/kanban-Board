@@ -123,7 +123,7 @@ const TaskManagement = () => {
         setErrorState({ ...errorState, deadline: "" });
     }
 
-    const onChangeHandler = (e: any) => {
+    const onChangeCreateTaskFormHandler = (e: any) => {
         const newStateObj: any = { ...state, [e.target.name]: e.target.value };
         const newErrorStateObj: any = { ...errorState, [e.target.name]: "" };
         setState(newStateObj);
@@ -292,7 +292,8 @@ const TaskManagement = () => {
                             <div className="task-card-child-1">
                                 <div>{taskObj.taskName}</div>
                                 <div>Priority : {taskObj.priority.toUpperCase()}</div>
-                                <div>Deadline : {taskObj.deadline}</div>
+                                <div>Crt Date : {taskObj.crtdate}</div>
+                                <div>Due Date : {taskObj.deadline}</div>
                             </div>
                             <div className="task-card-child-2">
                                 <Tooltip title="Previous stage">
@@ -492,7 +493,7 @@ const TaskManagement = () => {
                                     inputProps={{ maxLength: 30 }}
                                     fullWidth
                                     value={state?.taskName || ""}
-                                    onChange={onChangeHandler}
+                                    onChange={onChangeCreateTaskFormHandler}
                                     helperText={errorState.taskName}
                                     error={errorState.taskName ? true : false}
                                 />
@@ -504,7 +505,7 @@ const TaskManagement = () => {
                                     options={stagesArray}
                                     required
                                     value={`${state.stage}`}
-                                    onChange={onChangeHandler}
+                                    onChange={onChangeCreateTaskFormHandler}
                                     readonly={popUpType === "CREATE" ? true : false}
                                 />
                             </Grid>
@@ -515,7 +516,7 @@ const TaskManagement = () => {
                                     options={prioritiesArr}
                                     required
                                     value={state?.priority || ""}
-                                    onChange={onChangeHandler}
+                                    onChange={onChangeCreateTaskFormHandler}
                                     error={errorState.priority ? true : false}
                                 />
                                 <FormHelperText style={{ color: "red" }}>

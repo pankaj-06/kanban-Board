@@ -7,7 +7,6 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import InputField from '../../Components/InputField';
 import { useForm } from 'react-hook-form';
-import './login.css';
 import { useDispatch, } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useToasts } from 'react-toast-notifications';
@@ -20,7 +19,7 @@ import { ILoggedInUserDetails, userLoggedIn } from '../../Redux/Actions/AuthActi
 import Loader from '../../Components/loader/loader';
 import { setTitle } from '../../Utils/Helper';
 import { AxiosError } from 'axios';
-
+import './login.css';
 
 interface ILoginData {
   email: string;
@@ -28,15 +27,14 @@ interface ILoginData {
 }
 
 export default function Login() {
-  setTitle("Signin");
-  const [loading, isLoading] = useState(true);
+  setTitle("SignIn");
   const isUserLoggedIn = localStorage.getItem("userLoggedIn");
   const { register, handleSubmit, formState: { errors, } } = useForm<ILoginData>();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { addToast } = useToasts();
   const [catptchaToken, setCaptchaToken] = useState<string | null>("");
-
+  const [loading, isLoading] = useState(true);
 
   useEffect(() => {
     if (isUserLoggedIn === "true") {
@@ -45,6 +43,43 @@ export default function Login() {
     isLoading(false);
   }, [])
 
+
+  /**
+   * This function execute after successful login.
+   * @purpose Set user details in app stoarge ( Redux ) and redirect to dashboard.
+   */
+  const successLoginFn = (loggedInUserData: ILoggedInUserDetails) => {
+    const payload: ILoggedInUserDetails = {
+      name: loggedInUserData.name,
+      email: loggedInUserData.email,
+      profileImg: loggedInUserData.profileImg,
+      tel: loggedInUserData.tel,
+      userName: loggedInUserData.userName
+    }
+    localStorage.setItem("userLoggedIn", "true");
+    dispatch(userLoggedIn(payload));
+    navigate('/dashboard');
+    addToast(messagesObject.loginSuccess, { appearance: "success" });
+    isLoading(false);
+  }
+
+  /**
+   * failureLoginFn execute inside catch block.
+   * If login is not successfull then show error mssage.
+   */
+  const failureLoginFn = (error: AxiosError) => {
+    isLoading(false);
+    let errorMsg = messagesObject.emailOrPwdIncorrect;
+    if (error.code === "ERR_NETWORK") {
+      errorMsg = `${error.message}. ${messagesObject.contactAdmin}`;
+    }
+    addToast(errorMsg, { appearance: "error" });
+  }
+
+
+  /**
+   * This function is used for submit login form data and calling login api.
+   */
   const submitLoginFormHandler = (data: any, e: any) => {
     e.preventDefault();
     if (catptchaToken) {
@@ -52,38 +87,11 @@ export default function Login() {
       const queryString = `email=${data.email}&password=${data.password}`;
       getApiCall(`${getUsers}?${queryString}`).then((res) => {
         if (res.data) {
-          isLoading(false);
-          const loggedInUserData = res.data[0];
-          const payload: ILoggedInUserDetails = {
-            name: loggedInUserData.name,
-            email: loggedInUserData.email,
-            profileImg: loggedInUserData.profileImg,
-            tel: loggedInUserData.tel,
-            userName: loggedInUserData.userName
-          }
-          localStorage.setItem("userLoggedIn", "true");
-          dispatch(userLoggedIn(payload));
-          navigate('/dashboard');
-          addToast(messagesObject.loginSuccess, {
-            appearance: "success"
-          });
+          successLoginFn(res.data[0]);
         }
-      }).catch((err: AxiosError) => {
-        isLoading(false);
-        if (err.code === "ERR_NETWORK") {
-          addToast(`${err.message}. ${messagesObject.contactAdmin}`, {
-            appearance: "error"
-          });
-        } else {
-          addToast(messagesObject.emailOrPwdIncorrect, {
-            appearance: "error"
-          });
-        }
-      })
+      }).catch((err: AxiosError) => { failureLoginFn(err) })
     } else {
-      addToast(messagesObject.captchaRequired, {
-        appearance: "error"
-      })
+      addToast(messagesObject.captchaRequired, { appearance: "error" });
     }
 
   };

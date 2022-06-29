@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { setTitle } from "../../Utils/Helper";
 
 const LandingPage = () => {
-    setTitle("Landing-page");
+    setTitle("Landing page");
     const isUserLoggedIn = localStorage.getItem("userLoggedIn");
     const navigate = useNavigate();
 

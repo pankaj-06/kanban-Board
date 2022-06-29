@@ -5,7 +5,7 @@ import Footer from './Pages/Footer';
 import Loader from './Components/loader/loader';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import './App.css';
-import ResponsiveAppBar from './Pages/Topbar';
+import TopBar from './Pages/Topbar';
 import { Provider } from 'react-redux';
 import { store } from './Redux/Store';
 import { ToastProvider } from 'react-toast-notifications';
@@ -17,7 +17,7 @@ function App() {
   return (
     <div className="app">
       <BrowserRouter>
-        <ResponsiveAppBar />
+        <TopBar />
         <main className='main'>
           <React.Suspense fallback={<Loader />}>
             <Routes>
