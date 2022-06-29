@@ -110,5 +110,7 @@
 .trash-conatiner {
     position: fixed;
     bottom: 50px;
-    right: 20px;
+    right: 2px;
+    width:70px;
+ 
 }

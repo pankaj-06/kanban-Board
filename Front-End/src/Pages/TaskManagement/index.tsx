@@ -295,7 +295,7 @@ const TaskManagement = () => {
                                 <div>Deadline : {taskObj.deadline}</div>
                             </div>
                             <div className="task-card-child-2">
-                                <Tooltip title="Back">
+                                <Tooltip title="Previous stage">
                                     <IconButton
                                         disabled={taskObj.stage === BACKLOG ? true : false}
                                         aria-label="back"
@@ -323,7 +323,7 @@ const TaskManagement = () => {
                                         <DeleteIcon />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Forward">
+                                <Tooltip title="Next stage">
                                     <IconButton
                                         disabled={taskObj.stage === DONE ? true : false}
                                         aria-label="forward"
