@@ -37,7 +37,7 @@ const Dashboard = () => {
 
 
   const getTaskStatusBox = (taskDetailsArr: ITaskDetails[] = [], filterByStatusDone: boolean) => {
-    const filteredArr = filterByStatusDone ? taskDetailsArr.filter((val) => val.stage === DONE) : taskDetailsArr.filter((val) => val.stage !== DONE);
+    const filteredArr = getFilteredData(taskDetailsArr, filterByStatusDone);
     return filteredArr.map((taskDetails, idx: number) => {
       const styleObj = { backgroundColor: stageColor[getStageName(taskDetails.stage)], justifyContent: filterByStatusDone ? "center" : "space-between" };
       return (
@@ -54,7 +54,12 @@ const Dashboard = () => {
       )
     })
   }
-  
+
+  const getFilteredData = (taskDetailsArr: ITaskDetails[] = [], filterByStatusDone: boolean) => {
+    const filteredArr = filterByStatusDone ? taskDetailsArr.filter((val) => val.stage === DONE) : taskDetailsArr.filter((val) => val.stage !== DONE);
+    return filteredArr;
+  }
+
   return (
     <Container component="div" maxWidth="lg" className="dashboard-container" >
       <div className='dashboard-child-1'>
@@ -66,7 +71,7 @@ const Dashboard = () => {
         <Grid item xs={12} md={6} sm={6}>
           <div className="task-conatiner">
             <div className="task-container-header">
-              Completed Task's
+              Completed Task's {getFilteredData(tasksData, true).length > 0 && `(${getFilteredData(tasksData, true).length})`}
             </div>
             <div className="task-container-body">
               {getTaskStatusBox(tasksData, true)}
@@ -76,7 +81,7 @@ const Dashboard = () => {
         <Grid item xs={12} md={6} sm={6}>
           <div className="task-conatiner">
             <div className="task-container-header">
-              Pending Task's
+              Pending Task's {getFilteredData(tasksData, false).length > 0 && `(${getFilteredData(tasksData, false).length})`}
             </div>
             <div className="task-container-body">
               {getTaskStatusBox(tasksData, false)}

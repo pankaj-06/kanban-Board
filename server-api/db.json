@@ -14,7 +14,7 @@
     {
       "taskName": "Chart improvement",
       "priority": "low",
-      "stage": 2,
+      "stage": 3,
       "deadline": "06/30/2022",
       "crtdate": "06/29/2022",
       "id": "5d768bed-1ee2-4200-a4c4-aa423311cea5"
@@ -46,7 +46,7 @@
     {
       "taskName": "2",
       "priority": "medium",
-      "stage": 2,
+      "stage": 3,
       "deadline": "07/16/2022",
       "crtdate": "08/06/2022",
       "id": "e83ce652-fd96-40ea-8832-681bb40738be-2"
