@@ -297,42 +297,50 @@ const TaskManagement = () => {
                             </div>
                             <div className="task-card-child-2">
                                 <Tooltip title="Previous stage">
-                                    <IconButton
-                                        disabled={taskObj.stage === BACKLOG ? true : false}
-                                        aria-label="back"
-                                        color="inherit"
-                                        size="small"
-                                        onClick={() => backForwardHandler(taskObj, "PREVIOUS")}>
-                                        <ArrowBackIosIcon />
-                                    </IconButton>
+                                    <div>
+                                        <IconButton
+                                            disabled={taskObj.stage === BACKLOG ? true : false}
+                                            aria-label="back"
+                                            color="inherit"
+                                            size="small"
+                                            onClick={() => backForwardHandler(taskObj, "PREVIOUS")}>
+                                            <ArrowBackIosIcon />
+                                        </IconButton>
+                                    </div>
                                 </Tooltip>
                                 <Tooltip title="Edit">
-                                    <IconButton
-                                        aria-label="edit"
-                                        color="inherit"
-                                        size="small"
-                                        onClick={() => onEditTaskHandler(taskObj)}>
-                                        <BorderColorIcon />
-                                    </IconButton>
+                                    <div>
+                                        <IconButton
+                                            aria-label="edit"
+                                            color="inherit"
+                                            size="small"
+                                            onClick={() => onEditTaskHandler(taskObj)}>
+                                            <BorderColorIcon />
+                                        </IconButton>
+                                    </div>
                                 </Tooltip>
                                 <Tooltip title="Delete">
-                                    <IconButton
-                                        aria-label="delete"
-                                        color="inherit"
-                                        size="small"
-                                        onClick={() => handleClickOpenConfirmationPopup(taskObj.id!)}>
-                                        <DeleteIcon />
-                                    </IconButton>
+                                    <div>
+                                        <IconButton
+                                            aria-label="delete"
+                                            color="inherit"
+                                            size="small"
+                                            onClick={() => handleClickOpenConfirmationPopup(taskObj.id!)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </div>
                                 </Tooltip>
                                 <Tooltip title="Next stage">
-                                    <IconButton
-                                        disabled={taskObj.stage === DONE ? true : false}
-                                        aria-label="forward"
-                                        color="inherit"
-                                        size="small"
-                                        onClick={() => backForwardHandler(taskObj, "NEXT")}>
-                                        <ArrowForwardIosIcon />
-                                    </IconButton>
+                                    <div>
+                                        <IconButton
+                                            disabled={taskObj.stage === DONE ? true : false}
+                                            aria-label="forward"
+                                            color="inherit"
+                                            size="small"
+                                            onClick={() => backForwardHandler(taskObj, "NEXT")}>
+                                            <ArrowForwardIosIcon />
+                                        </IconButton>
+                                    </div>
                                 </Tooltip>
                             </div>
                         </div>
@@ -344,19 +352,21 @@ const TaskManagement = () => {
 
     const onDragEnd = (result: any) => {
         const { draggableId, destination, } = result;
-        if (destination && +destination.droppableId === -1) {
-            handleClickOpenConfirmationPopup(draggableId);
-        } else {
-            const matchedObj = tasks && tasks.find((val) => val.id === draggableId);;
-            if (matchedObj && +destination.droppableId !== matchedObj.stage) {
-                const payload: ITaskDetails = {
-                    ...matchedObj,
-                    stage: +destination.droppableId
-                };
-                updateTask(payload);
+        if (destination) {
+            const destinationDroppableId = +destination.droppableId;
+            if (destinationDroppableId === -1) {
+                handleClickOpenConfirmationPopup(draggableId);
+            } else {
+                const matchedObj = tasks && tasks.find((val) => val.id === draggableId);;
+                if (matchedObj && destinationDroppableId !== matchedObj.stage) {
+                    const payload: ITaskDetails = {
+                        ...matchedObj,
+                        stage: destinationDroppableId
+                    };
+                    updateTask(payload);
+                }
             }
         }
-
         setTrashDisplay(false);
     }
 
@@ -396,6 +406,7 @@ const TaskManagement = () => {
                                         <div className="task-container-body">
                                             {taskCard(tasks, BACKLOG)}
                                         </div>
+                                        {provided.placeholder}
                                     </div>
                                 )}
                             </Droppable>
@@ -415,6 +426,7 @@ const TaskManagement = () => {
                                         <div className="task-container-body">
                                             {taskCard(tasks, TODO)}
                                         </div>
+                                        {provided.placeholder}
                                     </div>
                                 )}
                             </Droppable>
@@ -434,6 +446,7 @@ const TaskManagement = () => {
                                         <div className="task-container-body">
                                             {taskCard(tasks, ONGOING)}
                                         </div>
+                                        {provided.placeholder}
                                     </div>
                                 )}
                             </Droppable>
@@ -453,6 +466,7 @@ const TaskManagement = () => {
                                         <div className="task-container-body">
                                             {taskCard(tasks, DONE)}
                                         </div>
+                                        {provided.placeholder}
                                     </div>
                                 )}
                             </Droppable>
@@ -467,6 +481,7 @@ const TaskManagement = () => {
                                 {...provided.droppableProps}
                             >
                                 {trashDisplay && <DeleteIcon style={{ fontSize: "50px", color: "#d50000" }} />}
+                                {provided.placeholder}
                             </div>
                         )}
                     </Droppable>
