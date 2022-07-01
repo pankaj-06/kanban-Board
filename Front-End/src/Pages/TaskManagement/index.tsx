@@ -351,6 +351,7 @@ const TaskManagement = () => {
     }
 
     const onDragEnd = (result: any) => {
+        console.log(result);
         const { draggableId, destination, } = result;
         if (destination) {
             const destinationDroppableId = +destination.droppableId;
@@ -455,7 +456,7 @@ const TaskManagement = () => {
                     <Grid item lg={3} md={6} xs={12}>
                         <div className="task-conatiner">
                             <div className="task-container-header" style={{ backgroundColor: stageColor.Done }}>
-                                Completed Task's
+                                Done Task's
                             </div>
                             <Droppable key={DONE} droppableId={`${DONE}`}>
                                 {(provided, snapshot) => (
@@ -480,7 +481,10 @@ const TaskManagement = () => {
                                 ref={provided.innerRef}
                                 {...provided.droppableProps}
                             >
-                                {trashDisplay && <DeleteIcon style={{ fontSize: "50px", color: "#d50000" }} />}
+                                <div className="del-icon-box">
+                                    {trashDisplay && <DeleteIcon style={{ fontSize: "50px", color: "#d50000" }} />}
+                                    <div style={{ visibility: "hidden" }}>Delete TAsk</div>
+                                </div>
                                 {provided.placeholder}
                             </div>
                         )}

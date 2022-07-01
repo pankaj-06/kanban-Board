@@ -109,8 +109,14 @@
 /* --------------------Delete Dragable Container------------------- */
 .trash-conatiner {
     position: fixed;
-    bottom: 50px;
+    bottom: 40px;
     right: 2px;
-    width:70px;
- 
+    width: 70px;
+    height: 70px;
+}
+
+.del-icon-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
